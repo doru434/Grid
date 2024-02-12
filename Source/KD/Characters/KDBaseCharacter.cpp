@@ -43,23 +43,22 @@ void AKDBaseCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void AKDBaseCharacter::OnMouseHoverFinished_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
-{
-	
-}
-
-void AKDBaseCharacter::OnMouseHoverStart_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
-{
-	
-}
-
-void AKDBaseCharacter::OnInteractFinished_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
-{
-	DecalComp->SetVisibility(false);
-}
-
-void AKDBaseCharacter::OnInteractStart_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void AKDBaseCharacter::OnInteractionBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
 	DecalComp->SetVisibility(true);
 }
 
+void AKDBaseCharacter::OnInteractionEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+{
+	DecalComp->SetVisibility(false);
+}
+
+void AKDBaseCharacter::OnMouseHoverBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+{
+
+}
+
+void AKDBaseCharacter::OnMouseHoverEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+{
+
+}

@@ -64,6 +64,9 @@ struct FInteractionData
 
 	bool IsValid() const;
 	void ClearData();
+
+	void OnInteractionStart(const UBaseInteractionComponent* InteractionComponent);
+	void OnInteractionEnd(const UBaseInteractionComponent* InteractionComponent);
 };
 
 USTRUCT(BlueprintType)
@@ -88,6 +91,7 @@ struct FHoverData
 
 	bool IsValid() const;
 	void ClearData();
-	void Hover(UBaseInteractionComponent* BaseInteractionComponent);
-	void Unhover(UBaseInteractionComponent* BaseInteractionComponent);
+
+	void OnMouseHoverBegining(const UBaseInteractionComponent* BaseInteractionComponent);
+	void OnMouseHoverEnd(const UBaseInteractionComponent* BaseInteractionComponent);
 };

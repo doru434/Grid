@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InteractionTypes.h"
+#include "BaseInteractionComponent.h"
 
 //===========
 // FInteractionHitData
@@ -31,40 +32,38 @@ void FHoverData::ClearData()
 	HoverInteractionHitData.Reset();
 }
 
-void FHoverData::Hover(UBaseInteractionComponent* BaseInteractionComponent)
+void FHoverData::OnMouseHoverBegining(const UBaseInteractionComponent* InteractionComponent)
 {
-	
 	if (HoverInteractionHitData.Actor->Implements<UInteractionInterface>())
 	{
-		IInteractionInterface::Execute_OnMouseHoverStart(HoverInteractionHitData.Actor, BaseInteractionComponent, HoverInteractionHitData.HitResult);
+		IInteractionInterface::Execute_OnMouseHoverBegining(HoverInteractionHitData.Actor, InteractionComponent, HoverInteractionHitData.HitResult);
 	}
 
 	for (UActorComponent* Comp : HoverInteractionHitData.ActorComponents)
 	{
-		IInteractionInterface::Execute_OnMouseHoverStart(Comp, BaseInteractionComponent, HoverInteractionHitData.HitResult);
+		IInteractionInterface::Execute_OnMouseHoverBegining(Comp, InteractionComponent, HoverInteractionHitData.HitResult);
 	}	
 }
 
-void FHoverData::Unhover(UBaseInteractionComponent* BaseInteractionComponent)
+void FHoverData::OnMouseHoverEnd(const UBaseInteractionComponent* InteractionComponent)
 {
 	AActor* HoveredActor = HoverInteractionHitData.Actor;
 	if (HoveredActor)
 	{
 		if (HoveredActor->Implements<UInteractionInterface>())
 		{
-			IInteractionInterface::Execute_OnMouseHoverFinished(HoveredActor, BaseInteractionComponent, HoverInteractionHitData.HitResult);
+			IInteractionInterface::Execute_OnMouseHoverEnd(HoveredActor, InteractionComponent, HoverInteractionHitData.HitResult);
 		}
 
 		for (UActorComponent* Comp : HoverInteractionHitData.ActorComponents)
 		{
 			if (Comp)
 			{
-				IInteractionInterface::Execute_OnMouseHoverFinished(Comp, BaseInteractionComponent, HoverInteractionHitData.HitResult);
+				IInteractionInterface::Execute_OnMouseHoverEnd(Comp, InteractionComponent, HoverInteractionHitData.HitResult);
 			}
 		}
 	}
 }
-
 
 //===========
 // FInteractionData
@@ -78,4 +77,52 @@ void FInteractionData::ClearData()
 {
 	InitialHitData.Reset();
 	FinalHitData.Reset();
+}
+
+void FInteractionData::OnInteractionStart(const UBaseInteractionComponent* InteractionComponent)
+{
+	if (!InitialHitData.IsValid())
+	{
+		return;
+	}
+
+	if (InitialHitData.Actor && InitialHitData.Actor->Implements<UInteractionInterface>())
+	{
+		IInteractionInterface::Execute_OnInteractionBegining(InitialHitData.Actor, InteractionComponent, InitialHitData.HitResult);
+	}
+
+	for (UActorComponent* Comp : InitialHitData.ActorComponents)
+	{
+		if (Comp)
+		{
+			IInteractionInterface::Execute_OnInteractionBegining(Comp, InteractionComponent, InitialHitData.HitResult);
+		}
+	}
+
+}
+
+void FInteractionData::OnInteractionEnd(const UBaseInteractionComponent* InteractionComponent)
+{
+	if (!FinalHitData.IsValid())
+	{
+		return;
+	}
+
+	if (InitialHitData.Actor)
+	{
+		if (InitialHitData.Actor && InitialHitData.Actor->Implements<UInteractionInterface>())
+		{
+			IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.Actor, InteractionComponent, InitialHitData.HitResult);
+		}
+
+		for (UActorComponent* Comp : InitialHitData.ActorComponents)
+		{
+			if (Comp)
+			{
+				IInteractionInterface::Execute_OnInteractionEnd(Comp, InteractionComponent, InitialHitData.HitResult);
+			}
+		}
+	}
+
+	ClearData();
 }

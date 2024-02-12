@@ -129,18 +129,19 @@ void UGridComponent::AlignGridToSurface()
 	}
 }
 
-void UGridComponent::OnMouseHoverFinished_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void UGridComponent::OnInteractionBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
-	ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
-	if (BaseTopDownPlayerPawn)
-	{
-		BaseTopDownPlayerPawn->UpdatePlayerCursor(false);
-	}
+
 }
 
-void UGridComponent::OnMouseHoverStart_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void UGridComponent::OnInteractionEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
-	ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
+
+}
+
+void UGridComponent::OnMouseHoverBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+{
+	const ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
 	if(BaseTopDownPlayerPawn)
 	{
 		TOptional<FTileData> TileData = GetTileDataAtLocation(HitResult.Location);
@@ -158,13 +159,12 @@ void UGridComponent::OnMouseHoverStart_Implementation(UBaseInteractionComponent*
 	}
 }
 
-void UGridComponent::OnInteractFinished_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void UGridComponent::OnMouseHoverEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
-	
-}
-
-void UGridComponent::OnInteractStart_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
-{
-	
+	const ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
+	if (BaseTopDownPlayerPawn)
+	{
+		BaseTopDownPlayerPawn->UpdatePlayerCursor(false);
+	}
 }
 

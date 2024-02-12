@@ -50,48 +50,53 @@ void UBaseInteractionComponent::CollectInteractionData(EInteractionState Interac
 	}
 	ensure(PlayerController);
 
-	FHitResult Hit;
-	GetHitUnderMouse(Hit);
-	AActor* ActorRaw = Hit.GetActor();
-
-	if (!Hit.bBlockingHit|| !ActorRaw)
+	if (HoverData.IsValid())
 	{
-		return;
-	}
-
-	AActor* ActorWithInteractionInterface = nullptr;
-	TArray<UActorComponent*> InteractedActorComponentsWithInteractionInterface;
-
-	if (ActorRaw->Implements<UInteractionInterface>())
-	{
-		ActorWithInteractionInterface = ActorRaw;
-	}
-
-	InteractedActorComponentsWithInteractionInterface = ActorRaw->GetComponentsByInterface(UInteractionInterface::StaticClass());
-
-
-	switch (InteractionState)
-	{
+		switch (InteractionState)
+		{
 		case EInteractionState::Initial:
-		{
-
-			InteractionData.InitialHitData.HitResult = Hit;
-			InteractionData.InitialHitData.Actor = ActorWithInteractionInterface;
-			InteractionData.InitialHitData.ActorComponents = InteractedActorComponentsWithInteractionInterface;
-
+			PupulateInteractionDataWithHoverData(InteractionData.InitialHitData);
 			break;
-		}
 		case EInteractionState::Final:
-		{
-			InteractionData.FinalHitData.HitResult = Hit;
-			InteractionData.FinalHitData.Actor = ActorWithInteractionInterface;
-			InteractionData.FinalHitData.ActorComponents = InteractedActorComponentsWithInteractionInterface;
-
+			PupulateInteractionDataWithHoverData(InteractionData.FinalHitData);
 			break;
-		}
 		default:
 			break;
+		}
 	}
+// 	AActor* ActorWithInteractionInterface = nullptr;
+// 	TArray<UActorComponent*> InteractedActorComponentsWithInteractionInterface;
+// 
+// 	if (ActorRaw->Implements<UInteractionInterface>())
+// 	{
+// 		ActorWithInteractionInterface = ActorRaw;
+// 	}
+// 
+// 	InteractedActorComponentsWithInteractionInterface = ActorRaw->GetComponentsByInterface(UInteractionInterface::StaticClass());
+// 
+// 
+// 	switch (InteractionState)
+// 	{
+// 		case EInteractionState::Initial:
+// 		{
+// 
+// 			InteractionData.InitialHitData.HitResult = Hit;
+// 			InteractionData.InitialHitData.Actor = ActorWithInteractionInterface;
+// 			InteractionData.InitialHitData.ActorComponents = InteractedActorComponentsWithInteractionInterface;
+// 
+// 			break;
+// 		}
+// 		case EInteractionState::Final:
+// 		{
+// 			InteractionData.FinalHitData.HitResult = Hit;
+// 			InteractionData.FinalHitData.Actor = ActorWithInteractionInterface;
+// 			InteractionData.FinalHitData.ActorComponents = InteractedActorComponentsWithInteractionInterface;
+// 
+// 			break;
+// 		}
+// 		default:
+// 			break;
+// 	}
 }
 
 void UBaseInteractionComponent::ClearInteractionData()
@@ -146,35 +151,24 @@ void UBaseInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 void UBaseInteractionComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	ensure(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &UBaseInteractionComponent::OnInteractionStart);
-	PlayerInputComponent->BindAction("Interact", IE_Released, this, &UBaseInteractionComponent::OnInteractionEnd);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &UBaseInteractionComponent::OnInteractionPressed);
+	PlayerInputComponent->BindAction("Interact", IE_Released, this, &UBaseInteractionComponent::OnInteractionReleased);
 }
 
-void UBaseInteractionComponent::OnInteractionStart()
+void UBaseInteractionComponent::OnInteractionPressed()
 {
+	InteractionData.OnInteractionEnd(this);
+
 	CollectInteractionData(EInteractionState::Initial);
-
-	if (HoverData.HoverInteractionHitData == InteractionData.InitialHitData)
-	{
-		return;
-	}
-
-	InteractionData.ClearData();
-
-	if (HoverData.IsValid())
-	{		
-		PupulateInteractionDataWithHoverData(InteractionData.InitialHitData);		
-	}
+	
+	InteractionData.OnInteractionStart(this);
 }
 
-void UBaseInteractionComponent::OnInteractionEnd()
+void UBaseInteractionComponent::OnInteractionReleased()
 {
 	CollectInteractionData(EInteractionState::Final);
 
-	if (HoverData.IsValid())
-	{
-		PupulateInteractionDataWithHoverData(InteractionData.FinalHitData);
-	}
+	InteractionData.OnInteractionEnd(this);	
 }
 
 void UBaseInteractionComponent::PupulateInteractionDataWithHoverData(FInteractionHitData& InteractionComponentHitData)
@@ -195,7 +189,7 @@ void UBaseInteractionComponent::ResolveHovering(const FHitResult& Hit)
 	//Hover
 	if (HoverData.IsValid())
 	{
-		HoverData.Hover(this);
+		HoverData.OnMouseHoverBegining(this);
 	}
 }
 
@@ -208,7 +202,7 @@ void UBaseInteractionComponent::PupulateHoverData(const FHitResult& Hit)
 
 void UBaseInteractionComponent::UnhoverPrevious()
 {
-	HoverData.Unhover(this);
+	HoverData.OnMouseHoverEnd(this);
 	HoverData.ClearData();
 }
 

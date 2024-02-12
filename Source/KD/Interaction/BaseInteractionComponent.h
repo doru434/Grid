@@ -39,8 +39,8 @@ private:
 	TObjectPtr<APlayerController> PlayerController;
 	TObjectPtr<ABaseTopDownPlayerPawn> BaseTopDownPlayerPawn;
 	
-	void OnInteractionStart();
-	void OnInteractionEnd();
+	void OnInteractionPressed();
+	void OnInteractionReleased();
 	void PupulateInteractionDataWithHoverData(FInteractionHitData& InteractionComponentHitData);
 
 	void CollectInteractionData(EInteractionState InteractionState);

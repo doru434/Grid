@@ -19,7 +19,7 @@ FGridData::FGridData():
 	  GridSize(10)
 	, TileSize(10.f)
 	, bFitToParent(true)
-	, ParentRoot(FVector(TileSize/2.f, TileSize/2.f, 0))
+	, ParentRoot(FVector(TileSize * 0.5f, TileSize * 0.5f, 0))
 	, GridRoot(FVector::ZeroVector)
 	, HalfParentSize(FVector::ZeroVector)
 {}

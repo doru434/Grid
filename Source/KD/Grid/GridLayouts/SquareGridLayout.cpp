@@ -72,19 +72,19 @@ TOptional<FTileData> USquareGridLayout::GetTileAtLocation(const FGridData& InGri
 	Index.X = FMath::FloorToInt((Location.X  - InGridData.GridRoot.X + OffsetForGridCenter + (InGridData.TileSize* 0.5f)) * InvTileSize);
 	Index.Y = FMath::FloorToInt((Location.Y  - InGridData.GridRoot.Y + OffsetForGridCenter + (InGridData.TileSize* 0.5f)) * InvTileSize);
 
-#if KD_LOG && WITH_EDITOR
-	if(GEngine)
-	{
-		const FString OnScreenMessage = FString::Printf(TEXT("GetTileAtLocation: %f %f"), Index.X, Index.Y);
-		GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Emerald, OnScreenMessage);
-		const FString OnScreenMessage2 = FString::Printf(TEXT("Location: %f %f"), Location.X, Location.Y);
-		GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Emerald, OnScreenMessage2);
-	}
-#endif
-	
 	if(InGridData.IsIndexValid(Index))
 	{
 		TileData = InGridData.Grid[Index.X].Tile[Index.Y];
+
+#if KD_LOG
+		if (GEngine)
+		{
+			const FString OnScreenMessage = FString::Printf(TEXT("Tile index: %d %d"), Index.X, Index.Y);
+			GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Emerald, OnScreenMessage);
+			const FString OnScreenMessage2 = FString::Printf(TEXT("Location: %f %f"), Location.X, Location.Y);
+			GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Emerald, OnScreenMessage2);
+		}
+#endif
 	}
 
 	return TileData;

@@ -11,23 +11,22 @@ ABaseInteractableActor::ABaseInteractableActor()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-
-void ABaseInteractableActor::OnMouseHoverFinished_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
-{
-
-}
-
-void ABaseInteractableActor::OnMouseHoverStart_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void ABaseInteractableActor::OnMouseHoverEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
 	
 }
 
-void ABaseInteractableActor::OnInteractFinished_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void ABaseInteractableActor::OnMouseHoverBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
 	
 }
 
-void ABaseInteractableActor::OnInteractStart_Implementation(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+void ABaseInteractableActor::OnInteractionEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
+{
+	
+}
+
+void ABaseInteractableActor::OnInteractionBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
 	
 }

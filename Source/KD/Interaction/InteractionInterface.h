@@ -25,14 +25,14 @@ class KD_API IInteractionInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void OnInteractStart(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
+	void OnInteractionBegining(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void OnInteractFinished(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
+	void OnInteractionEnd(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void OnMouseHoverStart(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
+	void OnMouseHoverBegining(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
-	void OnMouseHoverFinished(UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
+	void OnMouseHoverEnd(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
 };
