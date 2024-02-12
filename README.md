@@ -3,7 +3,7 @@
 ![image](https://github.com/doru434/Grid/assets/12116007/5fd14b4b-fadf-414d-a8be-1b2c3455657c)
 
 My variation about grids that are used on varius of games genres like strategy, rpg, survival.
-Right now its only after-work hobby project that still needs a lot of work.
+In early stages of development/ work in progress
 
 The idea is to be able to have any kind of 2D grid of any size with the right interface to build on that. 
 To achieve this, I gave up on actors / meshes / instanced static meshes and chose a mathematical representation to be able to create unlimited (to be honest, it's never unlimited, but its huge maximum value uint32 2^32 - 1 => 4,294,967,295 in one axis) grid sizes.
