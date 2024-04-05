@@ -10,12 +10,12 @@ void FInteractionHitData::Reset()
 {
 	HitResult = FHitResult();
 	Actor = nullptr;
-	ActorComponents.Reset();
+	ActorComponent = nullptr;
 }
 
 bool FInteractionHitData::IsValid() const
 {
-	return HitResult.GetActor() && (Actor || !ActorComponents.IsEmpty());
+	return HitResult.GetActor() && (Actor || !ActorComponent);
 }
 
 
@@ -39,9 +39,9 @@ void FHoverData::OnMouseHoverBegining(const UBaseInteractionComponent* Interacti
 		IInteractionInterface::Execute_OnMouseHoverBegining(HoverInteractionHitData.Actor, InteractionComponent, HoverInteractionHitData.HitResult);
 	}
 
-	for (UActorComponent* Comp : HoverInteractionHitData.ActorComponents)
+	if(HoverInteractionHitData.ActorComponent)
 	{
-		IInteractionInterface::Execute_OnMouseHoverBegining(Comp, InteractionComponent, HoverInteractionHitData.HitResult);
+		IInteractionInterface::Execute_OnMouseHoverBegining(HoverInteractionHitData.ActorComponent, InteractionComponent, HoverInteractionHitData.HitResult);
 	}	
 }
 
@@ -55,12 +55,10 @@ void FHoverData::OnMouseHoverEnd(const UBaseInteractionComponent* InteractionCom
 			IInteractionInterface::Execute_OnMouseHoverEnd(HoveredActor, InteractionComponent, HoverInteractionHitData.HitResult);
 		}
 
-		for (UActorComponent* Comp : HoverInteractionHitData.ActorComponents)
+		if (HoverInteractionHitData.ActorComponent)
 		{
-			if (Comp)
-			{
-				IInteractionInterface::Execute_OnMouseHoverEnd(Comp, InteractionComponent, HoverInteractionHitData.HitResult);
-			}
+			IInteractionInterface::Execute_OnMouseHoverEnd(HoverInteractionHitData.ActorComponent, InteractionComponent, HoverInteractionHitData.HitResult);
+		
 		}
 	}
 }
@@ -91,19 +89,16 @@ void FInteractionData::OnInteractionStart(const UBaseInteractionComponent* Inter
 		IInteractionInterface::Execute_OnInteractionBegining(InitialHitData.Actor, InteractionComponent, InitialHitData.HitResult);
 	}
 
-	for (UActorComponent* Comp : InitialHitData.ActorComponents)
+	if (InitialHitData.ActorComponent)
 	{
-		if (Comp)
-		{
-			IInteractionInterface::Execute_OnInteractionBegining(Comp, InteractionComponent, InitialHitData.HitResult);
-		}
+		IInteractionInterface::Execute_OnInteractionBegining(InitialHitData.ActorComponent, InteractionComponent, InitialHitData.HitResult);
 	}
 
 }
 
 void FInteractionData::OnInteractionEnd(const UBaseInteractionComponent* InteractionComponent)
 {
-	if (!FinalHitData.IsValid())
+	if (!InitialHitData.IsValid())
 	{
 		return;
 	}
@@ -115,12 +110,9 @@ void FInteractionData::OnInteractionEnd(const UBaseInteractionComponent* Interac
 			IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.Actor, InteractionComponent, InitialHitData.HitResult);
 		}
 
-		for (UActorComponent* Comp : InitialHitData.ActorComponents)
+		if (InitialHitData.ActorComponent)
 		{
-			if (Comp)
-			{
-				IInteractionInterface::Execute_OnInteractionEnd(Comp, InteractionComponent, InitialHitData.HitResult);
-			}
+			IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.ActorComponent, InteractionComponent, InitialHitData.HitResult);
 		}
 	}
 

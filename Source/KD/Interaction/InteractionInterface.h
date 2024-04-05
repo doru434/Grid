@@ -7,6 +7,7 @@
 #include "InteractionInterface.generated.h"
 
 class UBaseInteractionComponent;
+class UPayloadInteractionData;
 
 // This class does not need to be modified.
 UINTERFACE()
@@ -23,7 +24,6 @@ class KD_API IInteractionInterface
 	GENERATED_BODY()
 
 public:
-
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void OnInteractionBegining(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
 
@@ -35,4 +35,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	void OnMouseHoverEnd(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	UPayloadInteractionData* GetPayload(const FHitResult& HitResult);
 };

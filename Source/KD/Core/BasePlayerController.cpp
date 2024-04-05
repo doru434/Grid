@@ -5,6 +5,10 @@
 #include "KD/Camera/PlayerCameraMovementInterface.h"
 #include "KD/Player/BaseTopDownPlayerPawn.h"
 #include "KD/Interaction/BaseInteractionComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "InputActionValue.h"
 
 ABasePlayerController::ABasePlayerController()
 {
@@ -21,16 +25,32 @@ void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAxis("MoveForward", this, &ABasePlayerController::MoveForward);
-	InputComponent->BindAxis("MoveRight", this, &ABasePlayerController::MoveRight);
+	if (ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* InputSystem = LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (!BasicInputMapping.IsNull())
+			{
+				InputSystem->AddMappingContext(BasicInputMapping.LoadSynchronous(), 0);
+			}
+		}
+	}
+
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
+	if (Input)
+	{
+		Input->BindAction(MovementAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnMove);
+		Input->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ABasePlayerController::OnZoom);
+	}
+
+// 	InputComponent->BindAxis("MoveForward", this, &ABasePlayerController::MoveForward);
+// 	InputComponent->BindAxis("MoveRight", this, &ABasePlayerController::MoveRight);
 	InputComponent->BindAxis("Rotate", this, &ABasePlayerController::Rotate);
 	InputComponent->BindAxis("Zoom", this, &ABasePlayerController::Zoom);
 
 	InputComponent->BindAction("MouseCameraMovementKey", IE_Pressed, this, &ABasePlayerController::MouseCameraMovementActivation);
 	InputComponent->BindAction("MouseCameraMovementKey", IE_Released, this, &ABasePlayerController::MouseCameraMovementDeactivation);
 	InputComponent->BindAction("ResetRotation", IE_Pressed, this, &ABasePlayerController::ResetRotation);
-
-	InputComponent->BindAction("MainAction", IE_Pressed, this, &ABasePlayerController::MainAction);
 }
 
 FVector2D ABasePlayerController::GetGameViewportSize()
@@ -53,6 +73,31 @@ FVector2D ABasePlayerController::GetGameResolution()
 	Result.Y = GSystemResolution.ResY;
 
 	return Result;
+}
+
+void ABasePlayerController::OnMove(const FInputActionValue& Value)
+{
+	const FVector2D MoveValue = Value.Get<FVector2D>();
+
+	if (!FMath::IsNearlyZero(MoveValue.X))
+	{
+		MoveRight(MoveValue.X);
+	}
+
+	if (!FMath::IsNearlyZero(MoveValue.Y))
+	{
+		MoveForward(MoveValue.Y);
+	}
+}
+
+void ABasePlayerController::OnZoom(const FInputActionValue& Value)
+{
+	const float ZoomValue = Value.Get<float>();
+
+	if (!FMath::IsNearlyZero(ZoomValue))
+	{
+		Zoom(ZoomValue);
+	}
 }
 
 IPlayerCameraMovementInterface* ABasePlayerController::GetPlayerCameraMovementInterface() const
@@ -114,10 +159,4 @@ void ABasePlayerController::ResetRotation()
 {	
 	IPlayerCameraMovementInterface* PlayerCameraMovementInterface = GetPlayerCameraMovementInterface();
 	PlayerCameraMovementInterface->ResetRotation();
-}
-
-
-void ABasePlayerController::MainAction()
-{
-
 }

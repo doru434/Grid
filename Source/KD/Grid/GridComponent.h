@@ -31,6 +31,7 @@ public:
 	virtual void OnInteractionEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult) override;
 	virtual void OnMouseHoverBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult) override;
 	virtual void OnMouseHoverEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult) override;
+	virtual UPayloadInteractionData* GetPayload_Implementation(const FHitResult& HitResult) override;
 	// ~IInteractionInterface
 
 	TOptional<FTileData> GetTileDataAtLocation(const FVector& Location) const;

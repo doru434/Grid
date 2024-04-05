@@ -67,13 +67,15 @@ class KD_API UBaseCameraComponent : public USceneComponent
 {
 	GENERATED_UCLASS_BODY()
 public:	
+	//USceneComponent interface
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void OnRegister() override;
+	virtual void BeginPlay() override;
+	//End of USceneComponent interface
 
 	void MouseCameraMovementActivation();
 
 	void MouseCameraMovementDeactivation();
-
-	virtual void BeginPlay() override;
 
 	void Rotate(float AxisValue);
 	void Zoom(float AxisValue) const;
@@ -111,5 +113,5 @@ protected:
 	FCameraParamsData CameraParamsData;
 private:
 
-		
+
 };

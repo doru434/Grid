@@ -2,10 +2,54 @@
 
 #include "CoreMinimal.h"
 #include "IntVectorTypes.h"
+#include "Engine/DataAsset.h"
+#include "KD/Interaction/InteractionTypes.h"
 #include "GridTypes.generated.h"
+
 
 DECLARE_DYNAMIC_DELEGATE(FGridSizeChangedDelegate);
 
+UENUM(BlueprintType)
+enum class ETileType : uint8
+{
+	None,
+	Grassland,
+	Desert,
+	Forest
+};
+
+UCLASS()
+class UTileDataAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UTilePayloadInteractionDataAsset* GetTilePayloadInteractionDataAsset() const { return TilePayloadInteractionDataAsset; }
+
+protected:
+	UPROPERTY()
+	ETileType TileType = ETileType::None;
+
+	UPROPERTY()
+	TObjectPtr<UTilePayloadInteractionDataAsset> TilePayloadInteractionDataAsset = nullptr;;
+};
+
+UCLASS()
+class UTilePayloadInteractionDataAsset : public UPayloadInteractionData
+{
+	GENERATED_BODY()
+
+// public:
+// 	bool operator==(const UTilePayloadInteractionDataAsset& Other)
+// 	{
+// 		return IsEqual(&Other);
+// 	}
+// 
+// protected:
+// 	virtual bool IsEqual(const UTilePayloadInteractionDataAsset* Other) const { return true; }
+
+
+};
 
 USTRUCT()
 struct FTileData
@@ -18,6 +62,11 @@ struct FTileData
 
 	UPROPERTY(VisibleAnywhere)
 	FVector TilePosition;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UTileDataAsset> TileDataAsset;
+
+	UTilePayloadInteractionDataAsset* GetTilePayloadInteractionDataAssett() const { return TileDataAsset->GetTilePayloadInteractionDataAsset(); }
 };
 
 
@@ -50,7 +99,7 @@ struct FGridData
 
 	void SetSize(uint32 InSize);
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere)	
 	TArray<FGridRow> Grid;
 	
 	UPROPERTY(EditAnywhere)

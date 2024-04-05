@@ -2,7 +2,16 @@
 
 #include "CoreMinimal.h"
 #include "InteractionInterface.h"
+#include "Engine/DataAsset.h"
 #include "InteractionTypes.generated.h"
+
+UENUM(BlueprintType)
+enum class EInteractionComponentState : uint8
+{
+	Basic,
+	Selecting,
+	Building
+};
 
 UENUM(BlueprintType)
 enum class EInteractionState : uint8
@@ -11,10 +20,25 @@ enum class EInteractionState : uint8
 	Final
 };
 
+UCLASS(Abstract)
+class UPayloadInteractionData : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	bool operator==(const UPayloadInteractionData& Other)
+	{
+		return IsEqual(&Other);
+	}
+
+protected:
+	virtual bool IsEqual(const UPayloadInteractionData* Other) const { return true; }
+};
+
 USTRUCT(BlueprintType)
 struct FInteractionHitData
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 	FInteractionHitData()
 		: HitResult(FHitResult())
@@ -26,7 +50,18 @@ struct FInteractionHitData
 	{
 		HitResult = Hit;
 		Actor = Hit.GetActor();
-		ActorComponents = Actor->GetComponentsByInterface(UInteractionInterface::StaticClass());
+		ActorComponent = Actor->FindComponentByInterface(UInteractionInterface::StaticClass());
+
+		UObject* ObjectPtr = ActorComponent;
+		if (!ObjectPtr)
+		{
+			ObjectPtr = Actor->Implements<UInteractionInterface>() ? Actor : nullptr;
+		}
+
+		if (ObjectPtr)
+		{
+			Payload = IInteractionInterface::Execute_GetPayload(ObjectPtr, HitResult);
+		}
 	}
 
 	UPROPERTY(EditAnywhere)
@@ -36,17 +71,20 @@ struct FInteractionHitData
 	AActor* Actor;
 
 	UPROPERTY(EditAnywhere)
-	TArray<UActorComponent*> ActorComponents;
+	UActorComponent* ActorComponent;
+
+	UPROPERTY()
+	UPayloadInteractionData* Payload;
 
 	FORCEINLINE void SetHitResult(FHitResult& InHitResult) const { InHitResult = HitResult; }
 
 	void Reset();
 	bool IsValid() const;
-	bool operator == (const FInteractionHitData& Other)
+	bool IsEqual(const FInteractionHitData& Other) const
 	{
-		return  HitResult.Location == Other.HitResult.Location
-				&& Actor == Other.Actor
-				&& ActorComponents == Other.ActorComponents;
+		return	Actor == Other.Actor
+				&& ActorComponent == Other.ActorComponent
+				&& Payload == Other.Payload;
 	}
 };
 	
@@ -54,7 +92,7 @@ struct FInteractionHitData
 USTRUCT(BlueprintType)
 struct FInteractionData
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
 	FInteractionHitData InitialHitData;
@@ -72,7 +110,7 @@ struct FInteractionData
 USTRUCT(BlueprintType)
 struct FHoverData
 { 
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
 
 	FHoverData()
 		: HoverInteractionHitData(FInteractionHitData())
@@ -87,11 +125,14 @@ struct FHoverData
 	UPROPERTY(EditAnywhere)
 	FInteractionHitData HoverInteractionHitData;
 
-	FORCEINLINE void GetHitResult(FHitResult& InHitResult) { HoverInteractionHitData.SetHitResult(InHitResult); }
-
 	bool IsValid() const;
 	void ClearData();
 
 	void OnMouseHoverBegining(const UBaseInteractionComponent* BaseInteractionComponent);
 	void OnMouseHoverEnd(const UBaseInteractionComponent* BaseInteractionComponent);
+
+	bool IsEqual(const FHoverData& Other) const
+	{
+		return  HoverInteractionHitData.IsEqual(Other.HoverInteractionHitData);
+	}
 };

@@ -3,8 +3,9 @@
 
 #include "GridTypes.h"
 
-FTileData::FTileData():
-	 TilePosition(FVector::ZeroVector)
+FTileData::FTileData() :
+	TilePosition(FVector::ZeroVector)
+	, TileDataAsset(nullptr)
 {}
 
 FTileData::FTileData(const FVector& InTilePosition)

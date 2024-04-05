@@ -7,6 +7,9 @@
 #include "BasePlayerController.generated.h"
 
 class IPlayerCameraMovementInterface;
+class UInputMappingContext;
+class UInputAction;
+struct FInputActionValue;
 
 /**
  * 
@@ -21,11 +24,26 @@ public:
 	static FVector2D GetGameViewportSize();
 	static FVector2D GetGameResolution();
 
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TSoftObjectPtr<UInputMappingContext> BasicInputMapping;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> MovementAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> RotationAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> ZoomAction;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
 private:
+
+	void OnMove(const FInputActionValue& Value);
+	void OnZoom(const FInputActionValue& Value);
 
 	// Begin IPlayerCameraMovementInterface
 	IPlayerCameraMovementInterface* GetPlayerCameraMovementInterface() const;
@@ -39,5 +57,4 @@ private:
 	// End IPlayerCameraMovementInterface
 
 	IPlayerCameraMovementInterface* GetPlayerActionInterface() const;
-	virtual void MainAction();
 };

@@ -10,8 +10,9 @@
 
 class ABaseTopDownPlayerPawn;
 class UInputComponent;
+class UInputAction;
+struct FInputActionValue;
 
-	
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class KD_API UBaseInteractionComponent : public UActorComponent
 {
@@ -23,6 +24,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> MainAction;
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> BuildModeAction;
 
 protected:
 	// Called when the game starts
@@ -36,11 +43,20 @@ private:
 	UPROPERTY()
 	FHoverData HoverData;
 
+	UPROPERTY()
 	TObjectPtr<APlayerController> PlayerController;
+
+	UPROPERTY()
 	TObjectPtr<ABaseTopDownPlayerPawn> BaseTopDownPlayerPawn;
 	
-	void OnInteractionPressed();
-	void OnInteractionReleased();
+	EInteractionComponentState InteractionComponentState;
+
+	void OnMainActionPressed(const FInputActionValue& Value);
+	void OnMainActionReleased(const FInputActionValue& Value);
+
+	void OnBuildModePressed(const FInputActionValue& Value);
+
+
 	void PupulateInteractionDataWithHoverData(FInteractionHitData& InteractionComponentHitData);
 
 	void CollectInteractionData(EInteractionState InteractionState);
@@ -49,7 +65,8 @@ private:
 	bool GetHitUnderMouse(FHitResult& HitResult) const;
 
 	void ResolveHovering(const FHitResult& Hit);
-	void PupulateHoverData(const FHitResult& Hit);
+
+	bool HasHoverChanged(FHoverData& InHoverData) const;
 	void UnhoverPrevious();
 
 	void TryPopulatePlayerController();

@@ -21,5 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, config, Category = "KD", meta = (ToolTip = "DefaultCharacterSelectionDecalMaterial"))
 	TSoftObjectPtr<UMaterialInterface> DefaultCharacterSelectionDecalMaterial;
 	
+
+	UPROPERTY(EditAnywhere, config, Category = "Interaction", meta = (ToolTip = "Time after which Tooltip will be deslpayed"))
+	float TooltipDelay; 
+
 	static UKDSettings* Get() { return CastChecked<UKDSettings>(UKDSettings::StaticClass()->GetDefaultObject()); }
 };

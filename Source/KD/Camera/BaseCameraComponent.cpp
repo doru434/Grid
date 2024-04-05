@@ -6,7 +6,7 @@
 #include <Components/SceneComponent.h>
 #include <GameFramework/SpringArmComponent.h>
 #include <Kismet/GameplayStatics.h>
-#include "../Core/BasePlayerController.h"
+#include "KD/Core/BasePlayerController.h"
 
 // Sets default values for this component's properties
 UBaseCameraComponent::UBaseCameraComponent(const FObjectInitializer& ObjectInitializer)
@@ -25,21 +25,6 @@ UBaseCameraComponent::UBaseCameraComponent(const FObjectInitializer& ObjectIniti
 	CameraComponent->SetupAttachment(SpringArmComponent);
 }
 
-void UBaseCameraComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (SpringArmComponent)
-	{
-		SpringArmComponent->TargetArmLength = CameraParamsData.MinCameraHeight + ((CameraParamsData.MaxCameraHeight - CameraParamsData.MinCameraHeight) / 2);
-		SpringArmComponent->SetRelativeRotation(
-			FMath::Lerp(CameraParamsData.MinCameraRotation,
-				CameraParamsData.MaxCameraRotation,
-				(SpringArmComponent->TargetArmLength - CameraParamsData.MinCameraHeight) / (CameraParamsData.MaxCameraHeight - CameraParamsData.MinCameraHeight)
-			));
-	}
-}
- 
 void UBaseCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -65,6 +50,29 @@ void UBaseCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		RotateCameraByMouse();
 
 		BaseMousePosition = NewMousePosition;
+	}
+}
+
+void UBaseCameraComponent::OnRegister()
+{
+	Super::OnRegister();
+
+	SpringArmComponent->SetupAttachment(this);
+	CameraComponent->SetupAttachment(SpringArmComponent);
+}
+
+void UBaseCameraComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (SpringArmComponent)
+	{
+		SpringArmComponent->TargetArmLength = CameraParamsData.MinCameraHeight + ((CameraParamsData.MaxCameraHeight - CameraParamsData.MinCameraHeight) / 2);
+		SpringArmComponent->SetRelativeRotation(
+			FMath::Lerp(CameraParamsData.MinCameraRotation,
+				CameraParamsData.MaxCameraRotation,
+				(SpringArmComponent->TargetArmLength - CameraParamsData.MinCameraHeight) / (CameraParamsData.MaxCameraHeight - CameraParamsData.MinCameraHeight)
+			));
 	}
 }
 

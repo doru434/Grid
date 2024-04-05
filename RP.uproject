@@ -20,7 +20,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"AIModule",
-				"Landscape"
+				"Landscape",
+				"UMG"
 			]
 		}
 	],
@@ -42,6 +43,10 @@
 		},
 		{
 			"Name": "SkeletalMeshModelingTools",
+			"Enabled": true
+		},
+		{
+			"Name": "CommonUI",
 			"Enabled": true
 		}
 	]

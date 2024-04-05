@@ -10,9 +10,14 @@
 #include "KD/Player/BaseTopDownPlayerPawn.h"
 #include "KD/Grid/GridWorldSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "EnhancedInputComponent.h"
+#include "InputActionValue.h"
 
 // Sets default values for this component's properties
 UBaseInteractionComponent::UBaseInteractionComponent()
+	: InteractionComponentState(EInteractionComponentState::Basic)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bAllowTickOnDedicatedServer = false;
@@ -44,12 +49,6 @@ void UBaseInteractionComponent::BeginDestroy()
 
 void UBaseInteractionComponent::CollectInteractionData(EInteractionState InteractionState)
 {
-	if (!PlayerController)
-	{
-		TryPopulatePlayerController();
-	}
-	ensure(PlayerController);
-
 	if (HoverData.IsValid())
 	{
 		switch (InteractionState)
@@ -64,39 +63,6 @@ void UBaseInteractionComponent::CollectInteractionData(EInteractionState Interac
 			break;
 		}
 	}
-// 	AActor* ActorWithInteractionInterface = nullptr;
-// 	TArray<UActorComponent*> InteractedActorComponentsWithInteractionInterface;
-// 
-// 	if (ActorRaw->Implements<UInteractionInterface>())
-// 	{
-// 		ActorWithInteractionInterface = ActorRaw;
-// 	}
-// 
-// 	InteractedActorComponentsWithInteractionInterface = ActorRaw->GetComponentsByInterface(UInteractionInterface::StaticClass());
-// 
-// 
-// 	switch (InteractionState)
-// 	{
-// 		case EInteractionState::Initial:
-// 		{
-// 
-// 			InteractionData.InitialHitData.HitResult = Hit;
-// 			InteractionData.InitialHitData.Actor = ActorWithInteractionInterface;
-// 			InteractionData.InitialHitData.ActorComponents = InteractedActorComponentsWithInteractionInterface;
-// 
-// 			break;
-// 		}
-// 		case EInteractionState::Final:
-// 		{
-// 			InteractionData.FinalHitData.HitResult = Hit;
-// 			InteractionData.FinalHitData.Actor = ActorWithInteractionInterface;
-// 			InteractionData.FinalHitData.ActorComponents = InteractedActorComponentsWithInteractionInterface;
-// 
-// 			break;
-// 		}
-// 		default:
-// 			break;
-// 	}
 }
 
 void UBaseInteractionComponent::ClearInteractionData()
@@ -106,6 +72,11 @@ void UBaseInteractionComponent::ClearInteractionData()
 
 bool UBaseInteractionComponent::GetHitUnderMouse(FHitResult& HitResult) const
 {
+	if (!PlayerController)
+	{
+		return false;
+	}
+
 	const ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(PlayerController->Player);
 	if (LocalPlayer && LocalPlayer->ViewportClient)
 	{
@@ -142,20 +113,45 @@ void UBaseInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	FHitResult Hit;
 
-	if(GetHitUnderMouse(Hit))
+	if (GetHitUnderMouse(Hit))
 	{
 		ResolveHovering(Hit);
 	}
+
+	switch (InteractionComponentState)
+	{
+	case EInteractionComponentState::Basic:
+	{
+		break;
+	}
+	case EInteractionComponentState::Selecting:
+	{
+		CollectInteractionData(EInteractionState::Final);
+		break;
+	}
+	case EInteractionComponentState::Building:
+		break;
+	default:
+		break;
+	}
+
 }
 
 void UBaseInteractionComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	ensure(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &UBaseInteractionComponent::OnInteractionPressed);
-	PlayerInputComponent->BindAction("Interact", IE_Released, this, &UBaseInteractionComponent::OnInteractionReleased);
+
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (Input)
+	{
+		Input->BindAction(MainAction, ETriggerEvent::Started, this, &UBaseInteractionComponent::OnMainActionPressed);
+		Input->BindAction(MainAction, ETriggerEvent::Completed, this, &UBaseInteractionComponent::OnMainActionReleased);
+
+		Input->BindAction(BuildModeAction, ETriggerEvent::Triggered, this, &UBaseInteractionComponent::OnBuildModePressed);
+	}
 }
 
-void UBaseInteractionComponent::OnInteractionPressed()
+void UBaseInteractionComponent::OnMainActionPressed(const FInputActionValue& Value)
 {
 	InteractionData.OnInteractionEnd(this);
 
@@ -164,11 +160,14 @@ void UBaseInteractionComponent::OnInteractionPressed()
 	InteractionData.OnInteractionStart(this);
 }
 
-void UBaseInteractionComponent::OnInteractionReleased()
+void UBaseInteractionComponent::OnMainActionReleased(const FInputActionValue& Value)
 {
-	CollectInteractionData(EInteractionState::Final);
 
-	InteractionData.OnInteractionEnd(this);	
+}
+
+void UBaseInteractionComponent::OnBuildModePressed(const FInputActionValue& Value)
+{
+
 }
 
 void UBaseInteractionComponent::PupulateInteractionDataWithHoverData(FInteractionHitData& InteractionComponentHitData)
@@ -176,28 +175,32 @@ void UBaseInteractionComponent::PupulateInteractionDataWithHoverData(FInteractio
 	ensure(HoverData.IsValid());
 
 	InteractionComponentHitData.Actor = HoverData.HoverInteractionHitData.Actor;
-	InteractionComponentHitData.ActorComponents = HoverData.HoverInteractionHitData.ActorComponents;
+	InteractionComponentHitData.ActorComponent = HoverData.HoverInteractionHitData.ActorComponent;
 	InteractionComponentHitData.HitResult = HoverData.HoverInteractionHitData.HitResult;
 }
 
 void UBaseInteractionComponent::ResolveHovering(const FHitResult& Hit)
 {
-	UnhoverPrevious();
+	FHoverData TempHoverData(Hit);
 
-	PupulateHoverData(Hit);
-
-	//Hover
-	if (HoverData.IsValid())
+	if (Hit.bBlockingHit && HasHoverChanged(TempHoverData))
 	{
-		HoverData.OnMouseHoverBegining(this);
+		UE_LOG(LogTemp, Warning, TEXT("Hovering Changed"));
+		UnhoverPrevious();
+
+		HoverData = TempHoverData;
+
+		//Hover
+		if (HoverData.IsValid())
+		{
+			HoverData.OnMouseHoverBegining(this);
+		}
 	}
 }
 
-void UBaseInteractionComponent::PupulateHoverData(const FHitResult& Hit)
+bool UBaseInteractionComponent::HasHoverChanged(FHoverData& InHoverData) const
 {
-	ensure(Hit.bBlockingHit);
-
-	HoverData = FHoverData(Hit);
+	return HoverData.IsValid() ? !HoverData.IsEqual(InHoverData) : true;
 }
 
 void UBaseInteractionComponent::UnhoverPrevious()

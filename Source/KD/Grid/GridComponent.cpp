@@ -82,7 +82,7 @@ bool UGridComponent::GenerateGrid()
 	bGenerated = GridType->GenerateGrid(GridData);
 	AlignGridToSurface();
 
-#if KD_LOG && WITH_EDITOR
+#if KD_GRAPHIC_LOG
 	{
 		for(int i=0; i < GridData.Grid.Num(); i++)
 		{
@@ -147,7 +147,7 @@ void UGridComponent::OnMouseHoverBegining_Implementation(const UBaseInteractionC
 		TOptional<FTileData> TileData = GetTileDataAtLocation(HitResult.Location);
 		if (TileData.IsSet())
 		{
-#if WITH_EDITOR
+#if KD_LOG
 			if (GEngine)
 			{
 				const FString OnScreenMessage = FString::Printf(TEXT("Tile location: %f %f"), TileData.GetValue().TilePosition.X, TileData.GetValue().TilePosition.Y);
@@ -166,5 +166,18 @@ void UGridComponent::OnMouseHoverEnd_Implementation(const UBaseInteractionCompon
 	{
 		BaseTopDownPlayerPawn->UpdatePlayerCursor(false);
 	}
+}
+
+UPayloadInteractionData* UGridComponent::GetPayload_Implementation(const FHitResult& HitResult)
+{
+	UPayloadInteractionData* Payload = nullptr;
+
+	TOptional<FTileData> TileData = GetTileDataAtLocation(HitResult.Location);
+	if (TileData.IsSet())
+	{
+
+	}
+
+	return Payload;
 }
 

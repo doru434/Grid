@@ -7,11 +7,14 @@
 #include "KD/Camera/BaseCameraComponent.h"
 #include "KD/Grid/GridDecalComponent.h"
 #include "KD/Grid/GridSettings.h"
+#include "KD/Core/KDTypes.h"
+#include "Net/UnrealNetwork.h"
+#include "GameFramework/FloatingPawnMovement.h"
 
 
 ABaseTopDownPlayerPawn::ABaseTopDownPlayerPawn(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer),
-	CameraMovementSpeed(10.f)
+	: Super(ObjectInitializer)
+	, CameraMovementSpeed(10.f)
 {
 	InteractionComponent = ObjectInitializer.CreateDefaultSubobject<UBaseInteractionComponent>(this, TEXT("InteractionComponent"));
 
@@ -28,6 +31,11 @@ ABaseTopDownPlayerPawn::ABaseTopDownPlayerPawn(const FObjectInitializer& ObjectI
 
 	CursorGridDecalComponent->DecalSize = FVector(50.0,12.5,12.5);
 	CursorGridDecalComponent->bDestroyOwnerAfterFade = false;
+
+	MovementComponent = ObjectInitializer.CreateDefaultSubobject<UFloatingPawnMovement>(this, TEXT("MovementCompoennt"));
+	MovementComponent->UpdatedComponent = RootComponent;
+
+	bReplicates = true;
 }
 
 void ABaseTopDownPlayerPawn::UpdatePlayerCursor(const bool bShow, const FVector& NewLocation, const float Size) const
@@ -44,6 +52,11 @@ void ABaseTopDownPlayerPawn::UpdatePlayerCursor(const bool bShow, const FVector&
 	}
 }
 
+void ABaseTopDownPlayerPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
 void ABaseTopDownPlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
@@ -52,24 +65,30 @@ void ABaseTopDownPlayerPawn::BeginPlay()
 void ABaseTopDownPlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+#if KD_GRAPHIC_LOG
+	DrawDebugSphere(GetWorld(), GetActorLocation(), 10.f, 12, FColor::Green);
+#endif
 }
 
 //===== Begin IPlayerCameraMovementInterface
 void ABaseTopDownPlayerPawn::MoveForward(float AxisValue)
 {	
-	if (AxisValue)
+	if (MovementComponent && AxisValue)
 	{
-		const FVector Forward = GetActorForwardVector();
-		AddActorWorldOffset(Forward * (AxisValue * CameraComponent->GetCameraParamsData().CameraSpeed));
+		const FVector MovementVector = GetActorForwardVector() * AxisValue * CameraComponent->GetCameraParamsData().CameraSpeed;
+
+		OnOffsetUpdate(MovementVector);
 	}
 }
 
 void ABaseTopDownPlayerPawn::MoveRight(float AxisValue)
 {
-	if(AxisValue)
+	if(MovementComponent && AxisValue)
 	{
-		const FVector Right = GetActorRightVector();
-		AddActorWorldOffset(Right * (AxisValue * CameraComponent->GetCameraParamsData().CameraSpeed));
+		const FVector MovementVector = GetActorRightVector() * AxisValue * CameraComponent->GetCameraParamsData().CameraSpeed;
+
+		OnOffsetUpdate(MovementVector);
 	}
 }
 
@@ -97,6 +116,7 @@ void ABaseTopDownPlayerPawn::MouseCameraMovementDeactivation()
 {
 	CameraComponent->MouseCameraMovementDeactivation();
 }
+//===== End IPlayerCameraMovementInterface
 
 void ABaseTopDownPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -104,7 +124,22 @@ void ABaseTopDownPlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	
 	GetInteractionComponent()->SetupPlayerInputComponent(PlayerInputComponent);
 }
-//===== End IPlayerCameraMovementInterface
+
+void ABaseTopDownPlayerPawn::ServerUpdatePlayerPosition_Implementation(const FVector& Offset)
+{
+	OnOffsetUpdate(Offset);
+	ClientUpdatePlayerPosition(Offset);
+}
+
+void ABaseTopDownPlayerPawn::ClientUpdatePlayerPosition_Implementation(const FVector& Offset)
+{
+	OnOffsetUpdate(Offset);
+}
+
+void ABaseTopDownPlayerPawn::OnOffsetUpdate(const FVector& Offset)
+{
+	MovementComponent->AddInputVector(Offset);
+}
 
 void ABaseTopDownPlayerPawn::SetCursorGridDecalComponentLocation(const FVector& NewLocation) const
 {
