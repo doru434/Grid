@@ -7,6 +7,8 @@
 #include "BaseCommonWidget.h"
 #include "TooltipWidget.generated.h"
 
+enum class ETooltipType : uint8;
+class UBaseTooltipDataAsset;
 /**
  * 
  */

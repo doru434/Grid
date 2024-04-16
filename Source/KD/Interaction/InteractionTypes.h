@@ -73,6 +73,12 @@ struct FInteractionHitData
 	UPROPERTY(EditAnywhere)
 	UActorComponent* ActorComponent;
 
+	UPROPERTY(EditAnywhere)
+	bool bIsSubcomponent;
+
+	UPROPERTY(EditAnywhere)
+	uint32 ID;
+	
 	UPROPERTY()
 	UPayloadInteractionData* Payload;
 

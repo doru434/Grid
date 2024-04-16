@@ -7,6 +7,7 @@
 #include "GridTypes.generated.h"
 
 
+class UTilePayloadInteractionDataAsset;
 DECLARE_DYNAMIC_DELEGATE(FGridSizeChangedDelegate);
 
 UENUM(BlueprintType)

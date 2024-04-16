@@ -75,5 +75,6 @@ DerivedDataCache/*
 
 Plugins/Developer/*
 Plugins/HoudiniEngine/*
-
+!/Content
 Content/*
+!/Content/Repo

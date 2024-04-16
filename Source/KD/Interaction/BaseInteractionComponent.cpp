@@ -27,8 +27,8 @@ void UBaseInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	ENetRole NetRole = OwnerPawn ? OwnerPawn->GetRemoteRole() : ROLE_None;
+	const APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	const ENetRole NetRole = OwnerPawn ? OwnerPawn->GetRemoteRole() : ROLE_None;
 
 	if (!OwnerPawn || !(NetRole == ROLE_AutonomousProxy || NetRole == ROLE_SimulatedProxy))
 	{
