@@ -59,11 +59,14 @@ struct FTileData
 	
 	FTileData();
 
-	explicit FTileData(const FVector& InTilePosition);
+	explicit FTileData(const FVector& InTilePosition, const uint32 InID);
 
 	UPROPERTY(VisibleAnywhere)
 	FVector TilePosition;
 
+	UPROPERTY(VisibleAnywhere)
+	int32 ID;
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UTileDataAsset> TileDataAsset;
 

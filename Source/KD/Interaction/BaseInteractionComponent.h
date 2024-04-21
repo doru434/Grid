@@ -66,7 +66,7 @@ private:
 
 	void ResolveHovering(const FHitResult& Hit);
 
-	bool HasHoverChanged(FHoverData& InHoverData) const;
+	bool HasHoverChanged(const FHoverData& InHoverData) const;
 	void UnhoverPrevious();
 
 	void TryPopulatePlayerController();

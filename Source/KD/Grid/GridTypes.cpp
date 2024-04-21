@@ -5,13 +5,15 @@
 
 FTileData::FTileData() :
 	TilePosition(FVector::ZeroVector)
+	, ID(-1)
 	, TileDataAsset(nullptr)
 {}
 
-FTileData::FTileData(const FVector& InTilePosition)
-{
-	TilePosition=InTilePosition;
-}
+FTileData::FTileData(const FVector& InTilePosition, const uint32 InID) :
+	TilePosition(InTilePosition)
+	, ID(InID)
+	, TileDataAsset(nullptr)
+{}
 
 FGridRow::FGridRow()
 {}

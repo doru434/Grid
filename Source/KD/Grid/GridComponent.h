@@ -32,6 +32,8 @@ public:
 	virtual void OnMouseHoverBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult) override;
 	virtual void OnMouseHoverEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult) override;
 	virtual UPayloadInteractionData* GetPayload_Implementation(const FHitResult& HitResult) override;
+	virtual bool IsSubcomponent_Implementation(const FHitResult& HitResult) override;
+	virtual int32 GetSubcomponentID_Implementation(const FHitResult& HitResult) override;
 	// ~IInteractionInterface
 
 	TOptional<FTileData> GetTileDataAtLocation(const FVector& Location) const;

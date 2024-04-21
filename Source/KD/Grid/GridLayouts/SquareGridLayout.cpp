@@ -13,7 +13,9 @@ USquareGridLayout::USquareGridLayout()
 
 bool USquareGridLayout::GenerateGrid(FGridData& InGridData)
 {
+	uint32 TileID = 0;
 	Offset += InGridData.TileSize * 0.5f;
+	
 	if(InGridData.bFitToParent)
 	{
 		const double InvTileSize = 1.0/InGridData.TileSize;
@@ -30,12 +32,14 @@ bool USquareGridLayout::GenerateGrid(FGridData& InGridData)
 				TilePosition.X = (InGridData.TileSize * i) + Offset + InGridData.ParentRoot.X - InGridData.HalfParentSize.X;
 				TilePosition.Y = (InGridData.TileSize * j) + Offset + InGridData.ParentRoot.Y - InGridData.HalfParentSize.Y;
 
-				FTileData Tile(TilePosition);
+				FTileData Tile(TilePosition, TileID);
 				NewRow.Tile.Add(Tile);
 				if( i == 0 && j == 0)
 				{
 					InGridData.GridRoot = TilePosition;
 				}
+
+				++TileID;
 			}
 			InGridData.Grid.Add(NewRow);
 		}
@@ -54,14 +58,15 @@ bool USquareGridLayout::GenerateGrid(FGridData& InGridData)
 				TilePosition.X = (InGridData.TileSize * i) + Offset + InGridData.ParentRoot.X - OffsetForGridCenter;
 				TilePosition.Y = (InGridData.TileSize * j) + Offset + InGridData.ParentRoot.Y - OffsetForGridCenter;
 
-				FTileData Tile(TilePosition);
+				FTileData Tile(TilePosition, TileID);
 				NewRow.Tile.Add(Tile);
+
+				++TileID;
 			}
 			InGridData.Grid.Add(NewRow);
 		}
 		return true;
 	}
-	return false;
 }
 
 TOptional<FTileData> USquareGridLayout::GetTileAtLocation(const FGridData& InGridData, const FVector& Location) const

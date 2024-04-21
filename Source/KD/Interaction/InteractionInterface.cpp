@@ -5,3 +5,7 @@
 
 
 // Add default functionality here for any IInteractionInterface functions that are not pure virtual.
+bool IsSubcomponent_Implementation(const FHitResult& HitResult)
+{
+	return false;
+}

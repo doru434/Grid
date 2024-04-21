@@ -27,7 +27,9 @@ ABaseTopDownPlayerPawn::ABaseTopDownPlayerPawn(const FObjectInitializer& ObjectI
 	const UGridSettings* GridSettingsRaw = UGridSettings::Get();
 	UMaterialInterface* MaterialInterface = GridSettingsRaw->BasePlayerCursoreDecalMaterial.Get();
 
-	MaterialInterface ? CursorGridDecalComponent->SetDecalMaterial(MaterialInterface) : CursorGridDecalComponent->SetDecalMaterial(GridSettingsRaw->DefaultDecalMaterial.LoadSynchronous());
+	MaterialInterface ?
+		  CursorGridDecalComponent->SetDecalMaterial(MaterialInterface)
+		: CursorGridDecalComponent->SetDecalMaterial(GridSettingsRaw->DefaultDecalMaterial.LoadSynchronous());
 
 	CursorGridDecalComponent->DecalSize = FVector(50.0,12.5,12.5);
 	CursorGridDecalComponent->bDestroyOwnerAfterFade = false;

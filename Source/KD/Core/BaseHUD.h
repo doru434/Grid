@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "BaseHUD.generated.h"
 
+enum class ETooltipType : uint8;
 class UTooltipWidget;
 class UBaseTooltipDataAsset;
 

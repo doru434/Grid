@@ -38,4 +38,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
 	UPayloadInteractionData* GetPayload(const FHitResult& HitResult);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	bool IsSubcomponent(const FHitResult& HitResult);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interaction")
+	int32 GetSubcomponentID(const FHitResult& HitResult);
 };

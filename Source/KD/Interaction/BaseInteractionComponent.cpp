@@ -3,7 +3,6 @@
 
 #include "BaseInteractionComponent.h"
 
-#include "InteractionInterface.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 #include "GameFramework/HUD.h"
@@ -11,7 +10,6 @@
 #include "KD/Grid/GridWorldSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "EnhancedInputSubsystems.h"
-#include "InputMappingContext.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 
@@ -134,7 +132,6 @@ void UBaseInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	default:
 		break;
 	}
-
 }
 
 void UBaseInteractionComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -174,7 +171,7 @@ void UBaseInteractionComponent::PupulateInteractionDataWithHoverData(FInteractio
 {
 	ensure(HoverData.IsValid());
 
-	InteractionComponentHitData.Actor = HoverData.HoverInteractionHitData.Actor;
+	InteractionComponentHitData.InteractionInterfaceActor = HoverData.HoverInteractionHitData.InteractionInterfaceActor;
 	InteractionComponentHitData.ActorComponent = HoverData.HoverInteractionHitData.ActorComponent;
 	InteractionComponentHitData.HitResult = HoverData.HoverInteractionHitData.HitResult;
 }
@@ -198,9 +195,14 @@ void UBaseInteractionComponent::ResolveHovering(const FHitResult& Hit)
 	}
 }
 
-bool UBaseInteractionComponent::HasHoverChanged(FHoverData& InHoverData) const
+bool UBaseInteractionComponent::HasHoverChanged(const FHoverData& InHoverData) const
 {
-	return HoverData.IsValid() ? !HoverData.IsEqual(InHoverData) : true;
+	if(const bool bNewHoverDataValid = InHoverData.IsValid())
+	{
+		return HoverData.IsValid() ? !HoverData.IsEqual(InHoverData) : true;
+	}
+	
+	return HoverData.IsValid() ? true : false;
 }
 
 void UBaseInteractionComponent::UnhoverPrevious()

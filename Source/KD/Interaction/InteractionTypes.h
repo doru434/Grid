@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "InteractionInterface.h"
-#include "Engine/DataAsset.h"
+#include "Misc/Optional.h"
 #include "InteractionTypes.generated.h"
 
 UENUM(BlueprintType)
@@ -42,25 +42,31 @@ struct FInteractionHitData
 
 	FInteractionHitData()
 		: HitResult(FHitResult())
-		, Actor(nullptr)
+		, InteractionInterfaceActor(nullptr)
+		, bIsSubcomponent(false)
 	{
 	}
 
 	FInteractionHitData(const FHitResult& Hit)
 	{
 		HitResult = Hit;
-		Actor = Hit.GetActor();
-		ActorComponent = Actor->FindComponentByInterface(UInteractionInterface::StaticClass());
+		InteractionInterfaceActor = Hit.GetActor()->Implements<UInteractionInterface>() ? Hit.GetActor() : nullptr;
+		ActorComponent = Hit.GetActor()->FindComponentByInterface(UInteractionInterface::StaticClass());
 
 		UObject* ObjectPtr = ActorComponent;
-		if (!ObjectPtr)
+		if (!ObjectPtr && InteractionInterfaceActor)
 		{
-			ObjectPtr = Actor->Implements<UInteractionInterface>() ? Actor : nullptr;
+			ObjectPtr = InteractionInterfaceActor;
 		}
 
 		if (ObjectPtr)
 		{
 			Payload = IInteractionInterface::Execute_GetPayload(ObjectPtr, HitResult);
+			bIsSubcomponent = IInteractionInterface::Execute_IsSubcomponent(ObjectPtr, HitResult);
+			if(bIsSubcomponent)
+			{
+				ID = IInteractionInterface::Execute_GetSubcomponentID(ObjectPtr,HitResult);
+			}
 		}
 	}
 
@@ -68,7 +74,7 @@ struct FInteractionHitData
 	FHitResult HitResult;
 
 	UPROPERTY(EditAnywhere)
-	AActor* Actor;
+	AActor* InteractionInterfaceActor;
 
 	UPROPERTY(EditAnywhere)
 	UActorComponent* ActorComponent;
@@ -76,7 +82,7 @@ struct FInteractionHitData
 	UPROPERTY(EditAnywhere)
 	bool bIsSubcomponent;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	uint32 ID;
 	
 	UPROPERTY()
@@ -88,9 +94,10 @@ struct FInteractionHitData
 	bool IsValid() const;
 	bool IsEqual(const FInteractionHitData& Other) const
 	{
-		return	Actor == Other.Actor
+		return	InteractionInterfaceActor == Other.InteractionInterfaceActor
 				&& ActorComponent == Other.ActorComponent
-				&& Payload == Other.Payload;
+				&& Payload == Other.Payload
+				&& bIsSubcomponent ? ID == Other.ID : true;
 	}
 };
 	

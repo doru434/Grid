@@ -181,3 +181,28 @@ UPayloadInteractionData* UGridComponent::GetPayload_Implementation(const FHitRes
 	return Payload;
 }
 
+bool UGridComponent::IsSubcomponent_Implementation(const FHitResult& HitResult)
+{
+	return true;
+}
+
+int32 UGridComponent::GetSubcomponentID_Implementation(const FHitResult& HitResult)
+{
+	uint32 ID = 0;
+	const TOptional<FTileData> TileData = GetTileDataAtLocation(HitResult.Location);
+	if (TileData.IsSet())
+	{
+		const FTileData& TileDataRef = TileData.GetValue();
+		ID = TileDataRef.ID;
+#if KD_LOG
+		if (GEngine)
+		{
+			const FString OnScreenMessage = FString::Printf(TEXT("SubcomponentID %d at position Tile location: %f %f"), ID, TileDataRef.TilePosition.X, TileDataRef.TilePosition.Y);
+			GEngine->AddOnScreenDebugMessage(4, 2.f, FColor::Emerald, OnScreenMessage);
+		}
+#endif
+	}
+
+	return ID;
+}
+

@@ -9,13 +9,13 @@
 void FInteractionHitData::Reset()
 {
 	HitResult = FHitResult();
-	Actor = nullptr;
+	InteractionInterfaceActor = nullptr;
 	ActorComponent = nullptr;
 }
 
 bool FInteractionHitData::IsValid() const
 {
-	return HitResult.GetActor() && (Actor || !ActorComponent);
+	return HitResult.GetActor() && (InteractionInterfaceActor || ActorComponent);
 }
 
 
@@ -34,9 +34,9 @@ void FHoverData::ClearData()
 
 void FHoverData::OnMouseHoverBegining(const UBaseInteractionComponent* InteractionComponent)
 {
-	if (HoverInteractionHitData.Actor->Implements<UInteractionInterface>())
+	if (HoverInteractionHitData.InteractionInterfaceActor)
 	{
-		IInteractionInterface::Execute_OnMouseHoverBegining(HoverInteractionHitData.Actor, InteractionComponent, HoverInteractionHitData.HitResult);
+		IInteractionInterface::Execute_OnMouseHoverBegining(HoverInteractionHitData.InteractionInterfaceActor, InteractionComponent, HoverInteractionHitData.HitResult);
 	}
 
 	if(HoverInteractionHitData.ActorComponent)
@@ -47,20 +47,15 @@ void FHoverData::OnMouseHoverBegining(const UBaseInteractionComponent* Interacti
 
 void FHoverData::OnMouseHoverEnd(const UBaseInteractionComponent* InteractionComponent)
 {
-	AActor* HoveredActor = HoverInteractionHitData.Actor;
-	if (HoveredActor)
+	if (HoverInteractionHitData.InteractionInterfaceActor)
 	{
-		if (HoveredActor->Implements<UInteractionInterface>())
-		{
-			IInteractionInterface::Execute_OnMouseHoverEnd(HoveredActor, InteractionComponent, HoverInteractionHitData.HitResult);
-		}
-
-		if (HoverInteractionHitData.ActorComponent)
-		{
-			IInteractionInterface::Execute_OnMouseHoverEnd(HoverInteractionHitData.ActorComponent, InteractionComponent, HoverInteractionHitData.HitResult);
-		
-		}
+		IInteractionInterface::Execute_OnMouseHoverEnd(HoverInteractionHitData.InteractionInterfaceActor, InteractionComponent, HoverInteractionHitData.HitResult);
 	}
+
+	if(HoverInteractionHitData.ActorComponent)
+	{
+		IInteractionInterface::Execute_OnMouseHoverEnd(HoverInteractionHitData.ActorComponent, InteractionComponent, HoverInteractionHitData.HitResult);
+	}	
 }
 
 //===========
@@ -84,9 +79,9 @@ void FInteractionData::OnInteractionStart(const UBaseInteractionComponent* Inter
 		return;
 	}
 
-	if (InitialHitData.Actor && InitialHitData.Actor->Implements<UInteractionInterface>())
+	if (InitialHitData.InteractionInterfaceActor && InitialHitData.InteractionInterfaceActor->Implements<UInteractionInterface>())
 	{
-		IInteractionInterface::Execute_OnInteractionBegining(InitialHitData.Actor, InteractionComponent, InitialHitData.HitResult);
+		IInteractionInterface::Execute_OnInteractionBegining(InitialHitData.InteractionInterfaceActor, InteractionComponent, InitialHitData.HitResult);
 	}
 
 	if (InitialHitData.ActorComponent)
@@ -103,17 +98,14 @@ void FInteractionData::OnInteractionEnd(const UBaseInteractionComponent* Interac
 		return;
 	}
 
-	if (InitialHitData.Actor)
+	if (InitialHitData.InteractionInterfaceActor && InitialHitData.InteractionInterfaceActor->Implements<UInteractionInterface>())
 	{
-		if (InitialHitData.Actor && InitialHitData.Actor->Implements<UInteractionInterface>())
-		{
-			IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.Actor, InteractionComponent, InitialHitData.HitResult);
-		}
+		IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.InteractionInterfaceActor, InteractionComponent, InitialHitData.HitResult);
+	}
 
-		if (InitialHitData.ActorComponent)
-		{
-			IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.ActorComponent, InteractionComponent, InitialHitData.HitResult);
-		}
+	if (InitialHitData.ActorComponent)
+	{
+		IInteractionInterface::Execute_OnInteractionEnd(InitialHitData.ActorComponent, InteractionComponent, InitialHitData.HitResult);
 	}
 
 	ClearData();
