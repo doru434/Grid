@@ -8,6 +8,7 @@
 #include "KD/Grid/GridComponent.h"
 #include "BaseTopDownPlayerPawn.generated.h"
 
+class ABaseHUD;
 class UBaseInteractionComponent;
 class UBaseCameraComponent;
 class UGridDecalComponent;
@@ -29,9 +30,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE UGridDecalComponent* GetCursorGridDecalComponent() const {return CursorGridDecalComponent;}
 
+	/*InteractionComponent Interface*/
+	void OnTooltipChange(bool bShow, const FTileData& TileData, float Size);
 	void UpdatePlayerCursor(const bool bShow, const FVector& NewLocation = FVector::ZeroVector, const float Size = 0.f) const;
-
+	void UpdateTooltipWidget(const bool bShow, const FTileData& TileData);
+	/*End InteractionComponent Interface*/
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void CacheBaseHUD();
 
 protected:
 	virtual void BeginPlay() override;
@@ -65,6 +71,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UFloatingPawnMovement> MovementComponent;
+
+	UPROPERTY()
+	TObjectPtr<ABaseHUD> BaseHUD;
 
 	UFUNCTION(Server, Unreliable)
 	void ServerUpdatePlayerPosition(const FVector& Offset);

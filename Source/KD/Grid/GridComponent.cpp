@@ -141,7 +141,7 @@ void UGridComponent::OnInteractionEnd_Implementation(const UBaseInteractionCompo
 
 void UGridComponent::OnMouseHoverBegining_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
-	const ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
+	ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
 	if(BaseTopDownPlayerPawn)
 	{
 		TOptional<FTileData> TileData = GetTileDataAtLocation(HitResult.Location);
@@ -154,14 +154,14 @@ void UGridComponent::OnMouseHoverBegining_Implementation(const UBaseInteractionC
 				GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Emerald, OnScreenMessage);
 			}
 #endif
-			BaseTopDownPlayerPawn->UpdatePlayerCursor(true, TileData.GetValue().TilePosition, GetGridTileSize());
+			BaseTopDownPlayerPawn->OnTooltipChange(true, TileData.GetValue(), GetGridTileSize());
 		}
 	}
 }
 
 void UGridComponent::OnMouseHoverEnd_Implementation(const UBaseInteractionComponent* BaseInteractionComponent, const FHitResult& HitResult)
 {
-	const ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
+	ABaseTopDownPlayerPawn* BaseTopDownPlayerPawn = Cast<ABaseTopDownPlayerPawn>(BaseInteractionComponent->GetOwner());
 	if (BaseTopDownPlayerPawn)
 	{
 		BaseTopDownPlayerPawn->UpdatePlayerCursor(false);

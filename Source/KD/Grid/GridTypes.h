@@ -7,7 +7,7 @@
 #include "GridTypes.generated.h"
 
 
-class UTilePayloadInteractionDataAsset;
+class UTilePayloadInteractionData;
 DECLARE_DYNAMIC_DELEGATE(FGridSizeChangedDelegate);
 
 UENUM(BlueprintType)
@@ -25,18 +25,18 @@ class UTileDataAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UTilePayloadInteractionDataAsset* GetTilePayloadInteractionDataAsset() const { return TilePayloadInteractionDataAsset; }
+	UTilePayloadInteractionData* GetTilePayloadInteractionDataAsset() const { return TilePayloadInteractionDataAsset; }
 
 protected:
 	UPROPERTY()
 	ETileType TileType = ETileType::None;
 
 	UPROPERTY()
-	TObjectPtr<UTilePayloadInteractionDataAsset> TilePayloadInteractionDataAsset = nullptr;;
+	TObjectPtr<UTilePayloadInteractionData> TilePayloadInteractionDataAsset = nullptr;;
 };
 
 UCLASS()
-class UTilePayloadInteractionDataAsset : public UPayloadInteractionData
+class UTilePayloadInteractionData : public UPayloadInteractionData
 {
 	GENERATED_BODY()
 
@@ -70,7 +70,7 @@ struct FTileData
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UTileDataAsset> TileDataAsset;
 
-	UTilePayloadInteractionDataAsset* GetTilePayloadInteractionDataAssett() const { return TileDataAsset->GetTilePayloadInteractionDataAsset(); }
+	UTilePayloadInteractionData* GetTilePayloadInteractionDataAsset() const { return TileDataAsset->GetTilePayloadInteractionDataAsset(); }
 };
 
 

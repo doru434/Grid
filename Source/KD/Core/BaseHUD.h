@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "KD/Grid/GridTypes.h"
 #include "BaseHUD.generated.h"
 
 enum class ETooltipType : uint8;
@@ -17,12 +18,13 @@ class KD_API ABaseHUD : public AHUD
 	
 public:
 	virtual void DrawHUD() override;
+	void UpdateTooltipWidget(bool bShow, const FTileData& TileData);
 
 	UFUNCTION(BlueprintCallable)
 	void DrawTooltipWidget(const bool bShow);
 
 	UFUNCTION(BlueprintCallable)
-	void UpdateTooltipWidget(ETooltipType TooltipType, UBaseTooltipDataAsset* BaseTooltipDataAsset);
+	void UpdateTooltipWidget(UBaseTooltipDataAsset* BaseTooltipDataAsset);
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

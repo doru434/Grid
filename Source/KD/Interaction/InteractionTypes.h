@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "InteractionInterface.h"
-#include "Misc/Optional.h"
 #include "InteractionTypes.generated.h"
 
 UENUM(BlueprintType)

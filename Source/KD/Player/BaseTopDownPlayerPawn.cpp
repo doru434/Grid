@@ -10,11 +10,13 @@
 #include "KD/Core/KDTypes.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "KD/Core/BaseHUD.h"
 
 
 ABaseTopDownPlayerPawn::ABaseTopDownPlayerPawn(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 	, CameraMovementSpeed(10.f)
+	, BaseHUD(nullptr)
 {
 	InteractionComponent = ObjectInitializer.CreateDefaultSubobject<UBaseInteractionComponent>(this, TEXT("InteractionComponent"));
 
@@ -36,22 +38,37 @@ ABaseTopDownPlayerPawn::ABaseTopDownPlayerPawn(const FObjectInitializer& ObjectI
 
 	MovementComponent = ObjectInitializer.CreateDefaultSubobject<UFloatingPawnMovement>(this, TEXT("MovementCompoennt"));
 	MovementComponent->UpdatedComponent = RootComponent;
-
+	
 	bReplicates = true;
+}
+
+void ABaseTopDownPlayerPawn::OnTooltipChange(const bool bShow, const FTileData& TileData, const float Size)
+{
+	UpdatePlayerCursor(bShow, TileData.TilePosition, Size);
+	UpdateTooltipWidget(bShow, TileData);
 }
 
 void ABaseTopDownPlayerPawn::UpdatePlayerCursor(const bool bShow, const FVector& NewLocation, const float Size) const
 {
 	if (bShow)
 	{
-		GetCursorGridDecalComponent()->SetVisibility(bShow);
 		SetCursorGridDecalComponentLocation(NewLocation);
 		SetCursorGridDecalSize(Size);
 	}
-	else
+
+	GetCursorGridDecalComponent()->SetVisibility(bShow);
+}
+
+void ABaseTopDownPlayerPawn::UpdateTooltipWidget(const bool bShow, const FTileData& TileData)
+{
+	if(!BaseHUD)
 	{
-		GetCursorGridDecalComponent()->SetVisibility(bShow);
+		CacheBaseHUD();
 	}
+
+	check(BaseHUD);
+	
+	BaseHUD->DrawTooltipWidget(bShow);
 }
 
 void ABaseTopDownPlayerPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -59,9 +76,20 @@ void ABaseTopDownPlayerPawn::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
+void ABaseTopDownPlayerPawn::CacheBaseHUD()
+{
+	const APlayerController* PlayerControllerRaw = GetLocalViewingPlayerController();
+	if(PlayerControllerRaw)
+	{
+		BaseHUD = Cast<ABaseHUD>(PlayerControllerRaw->GetHUD());
+	}
+}
+
 void ABaseTopDownPlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CacheBaseHUD();
 }
 
 void ABaseTopDownPlayerPawn::Tick(float DeltaTime)

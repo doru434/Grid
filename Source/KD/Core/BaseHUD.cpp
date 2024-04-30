@@ -2,6 +2,8 @@
 
 
 #include "BaseHUD.h"
+
+#include "KD/Grid/GridTypes.h"
 #include "KD/UI/UITypes.h"
 #include "KD/UI/Widgets/ToolTipWidget.h"
 
@@ -10,9 +12,16 @@ void ABaseHUD::DrawHUD()
 	Super::DrawHUD();
 }
 
+void ABaseHUD::UpdateTooltipWidget(const bool bShow, const FTileData& TileData)
+{
+	DrawTooltipWidget(bShow);
+	//UpdateTooltipWidget()
+}
+
 void ABaseHUD::DrawTooltipWidget(const bool bShow)
 {
-
+	check(TooltipWidgetClass);
+	
 	if (TooltipWidgetClass)
 	{
 		UTooltipWidget* TooltipWidgetRaw = TooltipWidget.Get();
@@ -25,13 +34,13 @@ void ABaseHUD::DrawTooltipWidget(const bool bShow)
 	}
 }
 
-void ABaseHUD::UpdateTooltipWidget(ETooltipType TooltipType, UBaseTooltipDataAsset* BaseTooltipDataAsset)
+void ABaseHUD::UpdateTooltipWidget(UBaseTooltipDataAsset* BaseTooltipDataAsset)
 {
 	UTooltipWidget* TooltipWidgetRaw = TooltipWidget.Get();
 	ensure(TooltipWidgetRaw);
 	if (TooltipWidgetRaw)
 	{
-		TooltipWidgetRaw->Update(TooltipType, BaseTooltipDataAsset);
+		//TooltipWidgetRaw->Update(TooltipType, BaseTooltipDataAsset);
 	}
 }
 

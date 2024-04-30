@@ -14,15 +14,15 @@ UTooltipWidget::UTooltipWidget(const FObjectInitializer& ObjectInitializer)
 
 void UTooltipWidget::Update(ETooltipType TooltipType, UBaseTooltipDataAsset* BaseTooltipDataAsset)
 {
-	switch (TooltipType)
-	{
-	case ETooltipType::None:
-		break;
-	case ETooltipType::Tile:
-		break;
-	case ETooltipType::Unit:
-		break;
-	}
+	// switch (TooltipType)
+	// {
+	// case ETooltipType::None:
+	// 	break;
+	// case ETooltipType::Tile:
+	// 	break;
+	// case ETooltipType::Unit:
+	// 	break;
+	// }
 }
 
 void UTooltipWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

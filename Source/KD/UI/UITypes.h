@@ -4,7 +4,7 @@
 #include "Engine/DataAsset.h"
 #include "UITypes.generated.h"
 
-UCLASS(Blueprintable, BlueprintType, Abstract)
+UCLASS(Blueprintable, Abstract)
 class UBaseTooltipDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
@@ -16,6 +16,7 @@ UENUM(BlueprintType)
 enum class ETooltipType : uint8
 {
 	None,
-	Tile,
+	GridTile,
+	Default,
 	Unit
 };

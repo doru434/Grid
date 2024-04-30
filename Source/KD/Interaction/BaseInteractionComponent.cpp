@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
+#include "Logging/StructuredLog.h"
 
 // Sets default values for this component's properties
 UBaseInteractionComponent::UBaseInteractionComponent()
@@ -178,7 +179,7 @@ void UBaseInteractionComponent::PupulateInteractionDataWithHoverData(FInteractio
 
 void UBaseInteractionComponent::ResolveHovering(const FHitResult& Hit)
 {
-	FHoverData TempHoverData(Hit);
+	const FHoverData TempHoverData(Hit);
 
 	if (Hit.bBlockingHit && HasHoverChanged(TempHoverData))
 	{
